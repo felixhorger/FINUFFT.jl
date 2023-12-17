@@ -217,7 +217,7 @@ end
 
 """
     output::Array{Complex{T}} = finufft_exec(plan::finufft_plan{T},
-                      input::Array{Complex{T}}, step::Int8) where T <: finufftReal
+                      input::Array{Complex{T}}, step::UInt8) where T <: finufftReal
 
 Execute single or many-vector FINUFFT transforms in a plan.
 
@@ -250,7 +250,7 @@ Execute single or many-vector FINUFFT transforms in a plan.
               of such objects, ie, it has an extra last dimension `ntrans`.
 """
 function finufft_exec(plan::finufft_plan{T},
-                      input::Array{Complex{T}}, step::Int8) where T <: finufftReal
+                      input::Array{Complex{T}}, step::UInt8) where T <: finufftReal
     ret = 0
     type = plan.type
     ntrans = plan.ntrans
@@ -329,7 +329,7 @@ end
     finufft_exec!(plan::finufft_plan{T},
                       input::Array{Complex{T}},
                       output::Array{Complex{T}}
-		      step::Int8) where T <: finufftReal
+		      step::UInt8) where T <: finufftReal
 
 Execute single or many-vector FINUFFT transforms in a plan, with output written
 to preallocated array. See `finufft_exec` for arguments.
@@ -337,7 +337,7 @@ to preallocated array. See `finufft_exec` for arguments.
 function finufft_exec!(plan::finufft_plan{T},
                       input::Array{Complex{T}},
                       output::Array{Complex{T}},
-		      step::Int8
+		      step::UInt8
 		      ) where T <: finufftReal
     type = plan.type
     ntrans = plan.ntrans
@@ -375,7 +375,7 @@ function finufft_exec!(plan::finufft_plan{T},
                          (finufft_plan_c,
                           Ref{ComplexF64},
                           Ref{ComplexF64},
-			  Int8),
+			  UInt8),
                          plan.plan_ptr,input,output,step
                          )
         else
@@ -384,7 +384,7 @@ function finufft_exec!(plan::finufft_plan{T},
                          (finufft_plan_c,
                           Ref{ComplexF32},
                           Ref{ComplexF32},
-			  Int8),
+			  UInt8),
                          plan.plan_ptr,input,output,step
                          )
         end
@@ -401,7 +401,7 @@ function finufft_exec!(plan::finufft_plan{T},
                          (finufft_plan_c,
                           Ref{ComplexF64},
                           Ref{ComplexF64},
-			  Int8),
+			  UInt8),
                          plan.plan_ptr,output,input,step
                          )
         else
@@ -410,7 +410,7 @@ function finufft_exec!(plan::finufft_plan{T},
                          (finufft_plan_c,
                           Ref{ComplexF32},
                           Ref{ComplexF32},
-			  Int8),
+			  UInt8),
                          plan.plan_ptr,output,input,step
                          )
         end
@@ -427,7 +427,7 @@ function finufft_exec!(plan::finufft_plan{T},
                          (finufft_plan_c,
                           Ref{ComplexF64},
                           Ref{ComplexF64},
-			  Int8),
+			  UInt8),
                          plan.plan_ptr,input,output,step
                          )
         else
@@ -436,7 +436,7 @@ function finufft_exec!(plan::finufft_plan{T},
                          (finufft_plan_c,
                           Ref{ComplexF32},
                           Ref{ComplexF32},
-			  Int8),
+			  UInt8),
                          plan.plan_ptr,input,output,step
                          )
         end

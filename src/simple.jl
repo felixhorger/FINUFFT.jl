@@ -468,7 +468,7 @@ function nufft1d1!(xj      :: Array{T},
     checkkwdtype(T; kwargs...)
     plan = finufft_makeplan(1,[ms;],iflag,ntrans,eps;dtype=T,kwargs...)
     finufft_setpts!(plan,xj)
-    finufft_exec!(plan,cj,fk,7)
+    finufft_exec!(plan,cj,fk,0b111)
     ret = finufft_destroy!(plan)
     check_ret(ret)
 end
@@ -497,7 +497,7 @@ function nufft1d2!(xj      :: Array{T},
     checkkwdtype(T; kwargs...)
     plan = finufft_makeplan(2,[ms;],iflag,ntrans,eps;dtype=T,kwargs...)
     finufft_setpts!(plan,xj)
-    finufft_exec!(plan,fk,cj,7)
+    finufft_exec!(plan,fk,cj,0b111)
     ret = finufft_destroy!(plan)
     check_ret(ret)    
 end
@@ -528,7 +528,7 @@ function nufft1d3!(xj      :: Array{T},
     checkkwdtype(T; kwargs...)
     plan = finufft_makeplan(3,1,iflag,ntrans,eps;dtype=T,kwargs...)
     finufft_setpts!(plan,xj,T[],T[],sk)
-    finufft_exec!(plan,cj,fk,7)
+    finufft_exec!(plan,cj,fk,0b111)
     ret = finufft_destroy!(plan)
     check_ret(ret)
 end
@@ -563,7 +563,7 @@ function nufft2d1!(xj      :: Array{T},
     checkkwdtype(T; kwargs...)
     plan = finufft_makeplan(1,[ms;mt],iflag,ntrans,eps;dtype=T,kwargs...)
     finufft_setpts!(plan,xj,yj)
-    finufft_exec!(plan,cj,fk,7)
+    finufft_exec!(plan,cj,fk,0b111)
     ret = finufft_destroy!(plan)
     check_ret(ret)
 end
@@ -594,7 +594,7 @@ function nufft2d2!(xj      :: Array{T},
     checkkwdtype(T; kwargs...)
     plan = finufft_makeplan(2,[ms;mt],iflag,ntrans,eps;dtype=T,kwargs...)
     finufft_setpts!(plan,xj,yj)
-    finufft_exec!(plan,fk,cj,7)
+    finufft_exec!(plan,fk,cj,0b111)
     ret = finufft_destroy!(plan)
     check_ret(ret)
 end
@@ -628,7 +628,7 @@ function nufft2d3!(xj      :: Array{T},
     checkkwdtype(T; kwargs...)
     plan = finufft_makeplan(3,2,iflag,ntrans,eps;dtype=T,kwargs...)
     finufft_setpts!(plan,xj,yj,T[],sk,tk)
-    finufft_exec!(plan,cj,fk,7)
+    finufft_exec!(plan,cj,fk,0b111)
     ret = finufft_destroy!(plan)
     check_ret(ret)
 end
@@ -664,7 +664,7 @@ function nufft3d1!(xj      :: Array{T},
     checkkwdtype(T; kwargs...)
     plan = finufft_makeplan(1,[ms;mt;mu],iflag,ntrans,eps;dtype=T,kwargs...)
     finufft_setpts!(plan,xj,yj,zj)
-    finufft_exec!(plan,cj,fk,7)
+    finufft_exec!(plan,cj,fk,0b111)
     ret = finufft_destroy!(plan)
     check_ret(ret)
 end
@@ -696,7 +696,7 @@ function nufft3d2!(xj      :: Array{T},
     checkkwdtype(T; kwargs...)
     plan = finufft_makeplan(2,[ms;mt;mu],iflag,ntrans,eps;dtype=T,kwargs...)
     finufft_setpts!(plan,xj,yj,zj)
-    finufft_exec!(plan,fk,cj,7)
+    finufft_exec!(plan,fk,cj,0b111)
     ret = finufft_destroy!(plan)
     check_ret(ret)
 end
@@ -734,7 +734,7 @@ function nufft3d3!(xj      :: Array{T},
     checkkwdtype(T; kwargs...)
     plan = finufft_makeplan(3,3,iflag,ntrans,eps;dtype=T,kwargs...)
     finufft_setpts!(plan,xj,yj,zj,sk,tk,uk)
-    finufft_exec!(plan,cj,fk,7)
+    finufft_exec!(plan,cj,fk,0b111)
     ret = finufft_destroy!(plan)
     check_ret(ret)
 end
