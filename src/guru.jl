@@ -217,11 +217,11 @@ end
 
 """
     output::Array{Complex{T}} = finufft_exec(plan::finufft_plan{T},
-                      input::Array{Complex{T}}) where T <: finufftReal
+                      input::Array{Complex{T}}, step::Int8) where T <: finufftReal
 
 Execute single or many-vector FINUFFT transforms in a plan.
 
-  output = finufft_exec(plan, input)
+  output = finufft_exec(plan, input, step)
 
   For `plan` a previously created `finufft_plan` object also containing all
   needed nonuniform point coordinates, do a single (or if `ntrans>1` in the
@@ -237,6 +237,7 @@ Execute single or many-vector FINUFFT transforms in a plan.
               this is either a length-M vector (where M is the length of `xj`),
               or an `(M,ntrans)` matrix when `ntrans>1`. For type 2, in 1D this is size `(ms,)`, in 2D size `(ms,mt)`, or in 3D size `(ms,mt,mu)`, or
               each of these with an extra last dimension `ntrans` if `ntrans>1`.
+    - `step`     which steps to perform (bit mask, tested with & 1, & 2, & 4 for steps 1,2,3)
 # Output
      `output`   vector of output strengths at targets (types 2 or 3), or array
               of Fourier coefficients (type 1), or, if `ntrans>1`, a stack of
@@ -249,7 +250,7 @@ Execute single or many-vector FINUFFT transforms in a plan.
               of such objects, ie, it has an extra last dimension `ntrans`.
 """
 function finufft_exec(plan::finufft_plan{T},
-                      input::Array{Complex{T}}) where T <: finufftReal
+                      input::Array{Complex{T}}, step::Int8) where T <: finufftReal
     ret = 0
     type = plan.type
     ntrans = plan.ntrans
@@ -278,7 +279,7 @@ function finufft_exec(plan::finufft_plan{T},
         ret = ERR_TYPE_NOTVALID
     end
     check_ret(ret)
-    finufft_exec!(plan,input,output)
+    finufft_exec!(plan,input,output,step)
     return output
 end
 
@@ -327,14 +328,17 @@ end
 """
     finufft_exec!(plan::finufft_plan{T},
                       input::Array{Complex{T}},
-                      output::Array{Complex{T}}) where T <: finufftReal
+                      output::Array{Complex{T}}
+		      step::Int8) where T <: finufftReal
 
 Execute single or many-vector FINUFFT transforms in a plan, with output written
 to preallocated array. See `finufft_exec` for arguments.
 """
 function finufft_exec!(plan::finufft_plan{T},
                       input::Array{Complex{T}},
-                      output::Array{Complex{T}}) where T <: finufftReal
+                      output::Array{Complex{T}},
+		      step::Int8
+		      ) where T <: finufftReal
     type = plan.type
     ntrans = plan.ntrans
     dim = plan.dim
@@ -370,16 +374,18 @@ function finufft_exec!(plan::finufft_plan{T},
                          Cint,
                          (finufft_plan_c,
                           Ref{ComplexF64},
-                          Ref{ComplexF64}),
-                         plan.plan_ptr,input,output
+                          Ref{ComplexF64},
+			  Int8),
+                         plan.plan_ptr,input,output,step
                          )
         else
             ret = ccall( (:finufftf_execute, libfinufft),
                          Cint,
                          (finufft_plan_c,
                           Ref{ComplexF32},
-                          Ref{ComplexF32}),
-                         plan.plan_ptr,input,output
+                          Ref{ComplexF32},
+			  Int8),
+                         plan.plan_ptr,input,output,step
                          )
         end
     elseif type==2
@@ -394,16 +400,18 @@ function finufft_exec!(plan::finufft_plan{T},
                          Cint,
                          (finufft_plan_c,
                           Ref{ComplexF64},
-                          Ref{ComplexF64}),
-                         plan.plan_ptr,output,input
+                          Ref{ComplexF64},
+			  Int8),
+                         plan.plan_ptr,output,input,step
                          )
         else
             ret = ccall( (:finufftf_execute, libfinufft),
                          Cint,
                          (finufft_plan_c,
                           Ref{ComplexF32},
-                          Ref{ComplexF32}),
-                         plan.plan_ptr,output,input
+                          Ref{ComplexF32},
+			  Int8),
+                         plan.plan_ptr,output,input,step
                          )
         end
     elseif type==3
@@ -418,20 +426,42 @@ function finufft_exec!(plan::finufft_plan{T},
                          Cint,
                          (finufft_plan_c,
                           Ref{ComplexF64},
-                          Ref{ComplexF64}),
-                         plan.plan_ptr,input,output
+                          Ref{ComplexF64},
+			  Int8),
+                         plan.plan_ptr,input,output,step
                          )
         else
             ret = ccall( (:finufftf_execute, libfinufft),
                          Cint,
                          (finufft_plan_c,
                           Ref{ComplexF32},
-                          Ref{ComplexF32}),
-                         plan.plan_ptr,input,output
+                          Ref{ComplexF32},
+			  Int8),
+                         plan.plan_ptr,input,output,step
                          )
         end
     else
         ret = ERR_TYPE_NOTVALID
     end
     check_ret(ret)
+end
+
+function finufft_get_nf(plan::finufft_plan{T}) where T <: finufftReal
+    nf = Vector{Int64}(undef, 3)
+    ccall( (:finufft_get_nf, libfinufft),
+	Nothing,
+	(finufft_plan_c, Ptr{Clong}),
+	plan.plan_ptr, pointer(nf)
+	)
+    return nf
+end
+
+function finufft_get_fwbatch(plan::finufft_plan{T}) where T <: finufftReal
+    ptr = ccall( (:finufft_get_fwbatch, libfinufft),
+	Ptr{Complex{T}},
+	(finufft_plan_c,),
+	plan.plan_ptr
+	)
+    nf = finufft_get_nf(plan)
+    unsafe_wrap(Array{Complex{T}, 4}, ptr, (nf..., Int64(plan.ntrans)))
 end
